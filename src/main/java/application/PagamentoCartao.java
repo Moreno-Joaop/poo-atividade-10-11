@@ -3,18 +3,21 @@ package application;
 import lombok.Getter;
 
 @Getter
-public class PagamentoCartao extends Pagamento{
+public class PagamentoCartao extends Pagamento implements Priorizavel, Processavel{
     private String numeroCartao;
     private String titularCartao;
     private String validadeCartao;
     private String cvv;
 
-    public PagamentoCartao(double valor, String descricao, String numeroCartao, String titularCartao, String validadeCartao, String cvv) {
+    private int prioridade; 
+
+    public PagamentoCartao(double valor, String descricao, String numeroCartao, String titularCartao, String validadeCartao, String cvv, int prioridade) {
         super(valor, descricao);
         this.numeroCartao = numeroCartao;
         this.titularCartao = titularCartao;
         this.validadeCartao = validadeCartao;
         this.cvv = cvv;
+        this.prioridade = prioridade;
     }
 
     @Override
@@ -27,5 +30,32 @@ public class PagamentoCartao extends Pagamento{
     public boolean validarDados() {
         System.out.println("Validando dados do cartão para transação "+ this.getIdTransacao());
         return true;
+    }
+
+    @Override
+    public int obterNivelPrioridade(){
+        return this.prioridade;
+    }
+
+    @Override
+    public void definirPrioridade(int prioridade) {
+        if(prioridade >= 1 && prioridade <= 10) {
+            this.prioridade = prioridade;
+        } else {
+            System.out.println("Nível de prioridade Inválido (1-10)");
+        }
+    }
+
+    @Override
+    public boolean processar(){
+        System.out.println("Processando pagamento via cartão ID: " +this.getIdTransacao());
+        System.out.println("Transação " +this.getIdTransacao() + "APROVADO");
+        this.setStatus("Aprovado");
+        return true;
+    }
+
+    @Override
+    public String obterStatusProcessamento() {
+        return "Processamento via cartão" + this.getIdTransacao() + " : " + this.getStatus();
     }
 }
